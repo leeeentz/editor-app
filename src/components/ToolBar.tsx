@@ -1,12 +1,9 @@
 import React from "react";
 import '../styles/ToolBar.css';
 
-function ToolBar({ updateAppContext }) {
-  const setContext = (context) => {
-    console.log("Setting context to: " + context);
-    if (typeof updateAppContext === 'function') {
-      updateAppContext(context);
-    }
+function ToolBar(params:any) {
+  const setContext = (ctx:string) => {
+    console.log("Setting context to: " + ctx);
   };
   
   return (

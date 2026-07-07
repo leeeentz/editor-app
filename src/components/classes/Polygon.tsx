@@ -1,0 +1,48 @@
+import Vec2 from "./Vec2";
+import IObject2D from "../interfaces/IObject2D";
+import ITransforms from "../interfaces/ITransforms";
+
+class Polygon implements IObject2D {
+    origin: Vec2;
+    vertices: Array<Vec2>;
+    transforms: ITransforms;
+    color?: string;
+    type = "polygon";
+
+    constructor(origin: Vec2, vertices: Array<Vec2>) {
+        this.origin = origin;
+        this.vertices = vertices;
+        this.transforms = {
+            scale: {
+                x: 1,
+                y: 1,
+                z: 1
+            },
+            rotation: {
+                x: 0,
+                y: 0,
+                z: 0
+            },
+            translation: {
+                x: origin.x,
+                y: origin.y,
+                z: 0
+            }
+        }
+    }
+
+    setOriginToCenter() {
+        let minX = Math.min(...this.vertices.map(v => v.x));
+        let maxX = Math.max(...this.vertices.map(v => v.x));
+        let minY = Math.min(...this.vertices.map(v => v.y));
+        let maxY = Math.max(...this.vertices.map(v => v.y));
+        this.origin.x = (minX + maxX) / 2;
+        this.origin.y = (minY + maxY) / 2;
+    }
+
+    setOrigin(origin: Vec2) {
+        this.origin = origin;
+    }
+}
+
+export default Polygon;
