@@ -1,9 +1,15 @@
 import React from "react";
 import '../styles/ToolBar.css';
 
-function ToolBar(params:any) {
+interface ToolBarProps {
+  onContextChange: (ctx: string) => void;
+  currentContext?: string;
+}
+
+function ToolBar({onContextChange, currentContext}: ToolBarProps) {
+
   const setContext = (ctx:string) => {
-    console.log("Setting context to: " + ctx);
+    onContextChange(ctx);
   };
   
   return (

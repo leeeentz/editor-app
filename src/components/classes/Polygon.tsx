@@ -1,15 +1,16 @@
 import Vec2 from "./Vec2";
-import IObject2D from "../interfaces/IObject2D";
 import ITransforms from "../interfaces/ITransforms";
+import IPolygon from "../interfaces/IPolygon";
 
-class Polygon implements IObject2D {
+class Polygon implements IPolygon {
     origin: Vec2;
     vertices: Array<Vec2>;
     transforms: ITransforms;
     color?: string;
-    type = "polygon";
+    type: string;
 
     constructor(origin: Vec2, vertices: Array<Vec2>) {
+        this.type = "polygon";
         this.origin = origin;
         this.vertices = vertices;
         this.transforms = {

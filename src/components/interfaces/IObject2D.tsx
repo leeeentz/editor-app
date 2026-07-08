@@ -1,8 +1,8 @@
-import Vec2 from "../classes/Vec2";
 import ITransforms from "./ITransforms";
+import IVector from "./IVector";
 
 interface IObject2D {
-    origin: Vec2;
+    origin: IVector;
     transforms: ITransforms;
     type: string;
 }

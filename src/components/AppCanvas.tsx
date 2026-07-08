@@ -1,46 +1,95 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Sketch from 'react-p5';
 import Vec2 from './classes/Vec2';
-import Polygon from './classes/Polygon';
 import PolygonFactory from './classes/PolygonFactory';
 import PolygonRenderer from './classes/PolygonRenderer';
+import IObject2D from './interfaces/IObject2D';
 
-function AppCanvas(props: { canvasWidth: number, canvasHeight: number }) {
+interface AppCanvasProps {
+	canvasWidth: number;
+	canvasHeight: number;
+	viewContext: string;
+}
 
-	let canvasWidth = props.canvasWidth;
-	let canvasHeight = props.canvasHeight;
+function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
+	const [key, setKey] = useState(0);
+	const timeRef = useRef(0);
+	const myRendererRef = useRef<PolygonRenderer | null>(null);
 
-	let time = 0;
+	const sceneObjects: Array<IObject2D> = [];
 
-	let myPolygon:Polygon = PolygonFactory.createSquare(new Vec2(200, 300), 100);
-	myPolygon.setOriginToCenter();
+	const renderer = new PolygonRenderer(null);
 
-	let myPolygon_02:Polygon = PolygonFactory.createPolygon(new Vec2(400, 300), 100, 4);
+	const myPolygon = React.useMemo(() => {
+		const tmpPolygon = PolygonFactory.createSquare(new Vec2(200, 300), 100);
+		tmpPolygon.setOriginToCenter();
+		return tmpPolygon;
+	}, []);
 
-	let myRenderer:PolygonRenderer;
+	const myPolygon_02 = React.useMemo(() => {
+		const tmpPolygon = PolygonFactory.createPolygon(new Vec2(400, 300), 100, 4);
+		return tmpPolygon;
+	}, []);
+
+	useEffect(() => {
+		setKey(prev => prev + 1);
+		console.log(`Context changed to: ${viewContext}`);
+	}, [viewContext]);
 
 	const setup = (p:any, canvasParentRef:any) => {
 		p.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef);
 		p.background(255);
-		myRenderer = new PolygonRenderer(p);
-		myRenderer.activeObjects.push(myPolygon);
-		myRenderer.activeObjects.push(myPolygon_02);
+
+		renderer.p = p;
+
+		renderer.activeObjects.push(myPolygon);
+		renderer.activeObjects.push(myPolygon_02);
+
+		myRendererRef.current = renderer;
+
+		timeRef.current = 0;
+
+		p.fill(100, 150, 255);
+
 		console.log("Setup done");
+		
 	};
 
 	const draw = (p:any) => {
+		const renderer = myRendererRef.current;
+
+		if (!renderer) {
+			console.warn("Renderer is undefined");
+			return;
+		}
+
 		p.background(240);
-		p.fill(100, 150, 255);
+		
 		p.noStroke();
-		myPolygon.transforms.rotation.z = time * 0.01;
-		myPolygon_02.transforms.rotation.z += 0.002;
-		myRenderer.displayObjects();
-		time += 1;
+
+		for (const obj of renderer.activeObjects) {
+			obj.transforms.rotation.z += 0.005;
+		}
+
+		renderer.displayObjects(viewContext);
+		timeRef.current += 1;
+	};
+
+	const mouseClicked = (p:any) => {
+		console.log("click");
+		const renderer = myRendererRef.current;
+
+		if (!renderer) {
+			console.warn("Renderer not initialized");
+			return;
+		}
+
+		renderer.activeObjects.push(PolygonFactory.createPolygon(new Vec2(p.mouseX, p.mouseY), Math.random() * 100, Math.ceil((Math.random() * 6)) + 2));
 	};
 
 	return (
 		<div style={{ border: '1px solid #000000', width: canvasWidth, height: canvasHeight }}>
-			<Sketch setup={setup} draw={draw} />
+			<Sketch setup={setup} draw={draw} mouseClicked={mouseClicked} />
 		</div>
 	);
 }
