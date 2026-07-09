@@ -1,6 +1,8 @@
+import IVector from "./IVector";
+
 interface ITransforms {
-    scale: { x: number, y: number, z: number };
-    rotation: { x: number, y: number, z: number };
-    translation: { x: number, y: number, z: number };
+    scale: IVector;
+    rotation: IVector;
+    translation: IVector;
 }
 export default ITransforms;
