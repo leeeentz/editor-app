@@ -3,12 +3,10 @@ import IPolygon from "../interfaces/IPolygon";
 import type P5 from "p5";
 
 class PolygonRenderer implements I2DRenderer {
-    renderingObjectsBuffer: Array<IPolygon>;
     p?: P5;
     isInitialized: boolean;
 
     constructor() {
-        this.renderingObjectsBuffer = [];
         this.isInitialized = false;
     }
 
@@ -19,24 +17,21 @@ class PolygonRenderer implements I2DRenderer {
         }
         this.p = p;
         this.isInitialized = true;
+        console.log("PolygonRenderer is initialized");
     }
 
-    pushObject2DToRenderingBuffer(obj: IPolygon): void {
-        this.renderingObjectsBuffer.push(obj);
-    }
-
-    displayObjects(viewContext:string): void {
+    displayObjects(viewContext:string, renderingObjectsBuffer: Array<IPolygon>): void {
         if (!this.isInitialized || !this.p) {
             console.warn("Renderer is not initialized");
             return;
         }
 
-        if (this.renderingObjectsBuffer.length === 0) {
+        if (renderingObjectsBuffer.length === 0) {
             console.log("No active objects to display");
             return;
         }
 
-        for (let obj of this.renderingObjectsBuffer) {
+        for (let obj of renderingObjectsBuffer) {
             if (!obj.origin) {
                 console.log("Origin is undefined. Jumping to next object.");
                 break;
