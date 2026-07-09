@@ -4,22 +4,72 @@ import type P5 from "p5";
 import Vec2 from './classes/Vec2';
 import PolygonFactory from './classes/PolygonFactory';
 import PolygonRenderer from './classes/PolygonRenderer';
+import IAppCanvasProps from './interfaces/IAppCanvasProps';
+import Polygon from './classes/Polygon';
 import IObject2D from './interfaces/IObject2D';
+import IPolygon from './interfaces/IPolygon';
 
-interface AppCanvasProps {
-	canvasWidth: number;
-	canvasHeight: number;
-	viewContext: string;
+interface ITool {
+
+}
+class CreationTool implements ITool {
+	tmpVertices: Array<Vec2>;
+	isDrawing: boolean;
+
+	constructor () {
+		this.tmpVertices = [];
+		this.isDrawing = false;
+	}
 }
 
-function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
+interface IObjects2DBuffer {
+	getObjectByIndex(): IObject2D;
+	updateObjectByIndex(index: number, obj: IObject2D): void;/////
+	getObjectsArray(): Array<IObject2D>;
+	destroyObjectByIndex(): void;
+}
+
+/* class PolygonObjectsBuffer implements IObjects2DBuffer {
+	private indexes: Array<number>;
+	private objects?: Map<number, IPolygon>;
+
+	constructor(){
+		this.indexes = [];
+	}
+
+	updateObjectByIndex(index: number, obj: IPolygon): void {
+		if (!this.objects) {
+			console.warn("objects map is undefined. Aborting routine.");
+			return;
+		}
+
+		if (!this.objects.get(index)) {
+			console.warn("index returned invalid object. Aborting routine.");
+			return;
+		}
+
+		this.objects.set(index, obj);
+	}
+} */
+
+function AppCanvas({canvasWidth, canvasHeight, viewContext}: IAppCanvasProps) {
 	const [key, setKey] = useState(0);
+
 	const timeRef = useRef(0);
 	const myRendererRef = useRef<PolygonRenderer | null>(null);
 
-	const sceneObjects: Array<IObject2D> = [];
-
 	const renderer = new PolygonRenderer();
+
+	const sceneObjects: Array<Polygon> = [];
+
+
+	// Tem que ter um array de índices para consultar o buffer
+	// Tem que ser um mapa id-objeto
+	//const objectsBuffer: Map<number,
+
+	const newPolygon = React.useMemo(() => {
+		return PolygonFactory.createPolygon(new Vec2(400, 300), 100, 4);
+	}, []);
 
 	const myPolygon = React.useMemo(() => {
 		const tmpPolygon = PolygonFactory.createSquare(new Vec2(200, 300), 100);
@@ -37,14 +87,14 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 		console.log(`Context changed to: ${viewContext}`);
 	}, [viewContext]);
 
+	sceneObjects.push(newPolygon);
+
 	const setup = (p:P5, canvasParentRef:any) => {
+		//p.frameRate(6);
 		p.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef);
 		p.background(255);
 
 		renderer.initialize(p);
-
-		renderer.pushObject2DToRenderingBuffer(myPolygon);
-		renderer.pushObject2DToRenderingBuffer(myPolygon_02);
 
 		myRendererRef.current = renderer;
 
@@ -67,11 +117,14 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 		
 		p.noStroke();
 
-		for (const obj of renderer.renderingObjectsBuffer) {
+		for (const obj of sceneObjects) {
 			obj.transforms.rotation.z += 0.005;
 		}
 
-		renderer.displayObjects(viewContext);
+		//sceneObjects[0].vertices[0].x = p.mouseX;
+		//sceneObjects[0].vertices[0].y = p.mouseY;
+
+		renderer.displayObjects(viewContext, sceneObjects);
 		timeRef.current += 1;
 	};
 
@@ -83,7 +136,7 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 			console.warn("Renderer not initialized");
 			return;
 		}
-		renderer.pushObject2DToRenderingBuffer(PolygonFactory.createPolygon(new Vec2(p.mouseX, p.mouseY), Math.random() * 100, Math.ceil((Math.random() * 6)) + 2));
+		sceneObjects.push(PolygonFactory.createPolygon(new Vec2(p.mouseX, p.mouseY), Math.random() * 100, Math.ceil((Math.random() * 6)) + 2));
 	};
 
 	return (
