@@ -1,28 +1,52 @@
 import I2DRenderer from "../interfaces/I2DRenderer";
-import Polygon from "./Polygon";
+import IPolygon from "../interfaces/IPolygon";
+import type P5 from "p5";
 
 class PolygonRenderer implements I2DRenderer {
-    activeObjects: Array<Polygon>;
-    p: any;
+    renderingObjectsBuffer: Array<IPolygon>;
+    p?: P5;
+    isInitialized: boolean;
 
-    constructor(p: any) {
-        this.activeObjects = [];
+    constructor() {
+        this.renderingObjectsBuffer = [];
+        this.isInitialized = false;
+    }
+
+    initialize(p: P5) {
+        if (!p) {
+            console.log("Invalid or null P5 instance");
+            return;
+        }
         this.p = p;
+        this.isInitialized = true;
+    }
+
+    pushObject2DToRenderingBuffer(obj: IPolygon): void {
+        this.renderingObjectsBuffer.push(obj);
     }
 
     displayObjects(viewContext:string): void {
+        if (!this.isInitialized || !this.p) {
+            console.warn("Renderer is not initialized");
+            return;
+        }
 
-        if (this.activeObjects.length === 0) {
+        if (this.renderingObjectsBuffer.length === 0) {
             console.log("No active objects to display");
             return;
         }
 
-        for (let obj of this.activeObjects) {
+        for (let obj of this.renderingObjectsBuffer) {
+            if (!obj.origin) {
+                console.log("Origin is undefined. Jumping to next object.");
+                break;
+            }
+
             this.p.push();
             this.p.translate(obj.origin.x, obj.origin.y);
             this.p.scale(obj.transforms.scale.x, obj.transforms.scale.y);
             this.p.rotate(obj.transforms.rotation.z);
-            this.p.translate(-obj.origin.x, -obj.origin.y);
+            this.p.translate(- obj.origin.x, - obj.origin.y);
 
             if (viewContext === "selection") {
                 this.p.fill(100, 150, 255);
@@ -33,7 +57,7 @@ class PolygonRenderer implements I2DRenderer {
             } else {
                 this.p.fill(120, 160, 110);
             }
-            
+
             this.p.beginShape();
             for (let v of obj.vertices) {
                 this.p.vertex(v.x, v.y);

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Sketch from 'react-p5';
+import type P5 from "p5";
 import Vec2 from './classes/Vec2';
 import PolygonFactory from './classes/PolygonFactory';
 import PolygonRenderer from './classes/PolygonRenderer';
@@ -18,7 +19,7 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 
 	const sceneObjects: Array<IObject2D> = [];
 
-	const renderer = new PolygonRenderer(null);
+	const renderer = new PolygonRenderer();
 
 	const myPolygon = React.useMemo(() => {
 		const tmpPolygon = PolygonFactory.createSquare(new Vec2(200, 300), 100);
@@ -36,14 +37,14 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 		console.log(`Context changed to: ${viewContext}`);
 	}, [viewContext]);
 
-	const setup = (p:any, canvasParentRef:any) => {
+	const setup = (p:P5, canvasParentRef:any) => {
 		p.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef);
 		p.background(255);
 
-		renderer.p = p;
+		renderer.initialize(p);
 
-		renderer.activeObjects.push(myPolygon);
-		renderer.activeObjects.push(myPolygon_02);
+		renderer.pushObject2DToRenderingBuffer(myPolygon);
+		renderer.pushObject2DToRenderingBuffer(myPolygon_02);
 
 		myRendererRef.current = renderer;
 
@@ -52,10 +53,9 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 		p.fill(100, 150, 255);
 
 		console.log("Setup done");
-		
 	};
 
-	const draw = (p:any) => {
+	const draw = (p:P5) => {
 		const renderer = myRendererRef.current;
 
 		if (!renderer) {
@@ -67,7 +67,7 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 		
 		p.noStroke();
 
-		for (const obj of renderer.activeObjects) {
+		for (const obj of renderer.renderingObjectsBuffer) {
 			obj.transforms.rotation.z += 0.005;
 		}
 
@@ -75,7 +75,7 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 		timeRef.current += 1;
 	};
 
-	const mouseClicked = (p:any) => {
+	const mouseClicked = (p:P5) => {
 		console.log("click");
 		const renderer = myRendererRef.current;
 
@@ -83,8 +83,7 @@ function AppCanvas({canvasWidth, canvasHeight, viewContext}: AppCanvasProps) {
 			console.warn("Renderer not initialized");
 			return;
 		}
-
-		renderer.activeObjects.push(PolygonFactory.createPolygon(new Vec2(p.mouseX, p.mouseY), Math.random() * 100, Math.ceil((Math.random() * 6)) + 2));
+		renderer.pushObject2DToRenderingBuffer(PolygonFactory.createPolygon(new Vec2(p.mouseX, p.mouseY), Math.random() * 100, Math.ceil((Math.random() * 6)) + 2));
 	};
 
 	return (
