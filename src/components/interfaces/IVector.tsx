@@ -1,12 +1,8 @@
 interface IVector {
-	x?:number;
-	y?:number;
-	z?:number;
-	w?:number;
-	a?:number;
-	b?:number;
-	c?:number;
-	d?:number;
+	x:number;
+	y:number;
+	z:number;
+	w:number;
 	mag(): number;
 	add(): number;
 	mult(): number;

@@ -1,15 +1,15 @@
-import Vec2 from "./Vec2";
 import ITransforms from "../interfaces/ITransforms";
 import IPolygon from "../interfaces/IPolygon";
+import IVector from "../interfaces/IVector";
 
 class Polygon implements IPolygon {
-    origin: Vec2;
-    vertices: Array<Vec2>;
+    origin: IVector;
+    vertices: Array<IVector>;
     transforms: ITransforms;
     color?: string;
     type: string;
 
-    constructor(origin: Vec2, vertices: Array<Vec2>) {
+    constructor(origin: IVector, vertices: Array<IVector>) {
         this.type = "polygon";
         this.origin = origin;
         this.vertices = vertices;
@@ -41,7 +41,7 @@ class Polygon implements IPolygon {
         this.origin.y = (minY + maxY) / 2;
     }
 
-    setOrigin(origin: Vec2) {
+    setOrigin(origin: IVector) {
         this.origin = origin;
     }
 }
