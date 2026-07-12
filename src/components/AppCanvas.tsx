@@ -6,8 +6,6 @@ import PolygonFactory from './classes/PolygonFactory';
 import PolygonRenderer from './classes/PolygonRenderer';
 import IAppCanvasProps from './interfaces/IAppCanvasProps';
 import Polygon from './classes/Polygon';
-import IObject2D from './interfaces/IObject2D';
-import IPolygon from './interfaces/IPolygon';
 
 interface ITool {
 
@@ -21,36 +19,6 @@ class CreationTool implements ITool {
 		this.isDrawing = false;
 	}
 }
-
-interface IObjects2DBuffer {
-	getObjectByIndex(): IObject2D;
-	updateObjectByIndex(index: number, obj: IObject2D): void;/////
-	getObjectsArray(): Array<IObject2D>;
-	destroyObjectByIndex(): void;
-}
-
-/* class PolygonObjectsBuffer implements IObjects2DBuffer {
-	private indexes: Array<number>;
-	private objects?: Map<number, IPolygon>;
-
-	constructor(){
-		this.indexes = [];
-	}
-
-	updateObjectByIndex(index: number, obj: IPolygon): void {
-		if (!this.objects) {
-			console.warn("objects map is undefined. Aborting routine.");
-			return;
-		}
-
-		if (!this.objects.get(index)) {
-			console.warn("index returned invalid object. Aborting routine.");
-			return;
-		}
-
-		this.objects.set(index, obj);
-	}
-} */
 
 function AppCanvas({canvasWidth, canvasHeight, viewContext}: IAppCanvasProps) {
 	const [key, setKey] = useState(0);
