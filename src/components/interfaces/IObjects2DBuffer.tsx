@@ -1,12 +1,12 @@
 import IObject2D from "./IObject2D";
 
 interface IObjects2DBuffer {
-	getObjectByIndex?(): IObject2D;
-	updateObjectByIndex?(index: number, obj: IObject2D): void;
-	getObjectsArray?(): Array<IObject2D>;
-	getIndexesArray?(): Array<number>;
-	destroyObjectByIndex?(): void;
-	getIndexesSetAsArray?(): Array<number>
+	getObjectByIndex(index: number): IObject2D;
+	updateObjectByIndex(index: number, obj: IObject2D): void;
+	getObjectsArray(): Array<IObject2D>;
+	destroyObjectByIndex(index: number): void;
+	getIndexesSetAsArray(): Array<number>;
+	addObject(obj: IObject2D): number;
 }
 
 export default IObjects2DBuffer;
