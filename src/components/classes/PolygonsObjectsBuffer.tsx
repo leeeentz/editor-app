@@ -1,7 +1,8 @@
 import IObjects2DBuffer from "../interfaces/IObjects2DBuffer";
 import Polygon from "./Polygon";
 
-// A far more encapsulated class for querying and manipulating objects
+// A far more encapsulated class for querying and manipulating objects.
+// Using concrete implementation 'for now'
 class PolygonObjectsBuffer implements IObjects2DBuffer {
 	//private indexes: Array<number>;
 	private indexes: Set<number>
@@ -9,6 +10,28 @@ class PolygonObjectsBuffer implements IObjects2DBuffer {
 
 	constructor(){
 		this.indexes = new Set();
+	}
+
+    // Must certainly ruturn a Polygon (seriously, make sure of thst)
+    getObjectByIndex(index: number): Polygon {
+        const tmpPolygon: Polygon;
+        // Magic
+        return tmpPolygon;s
+    }
+
+	updateObjectByIndex(index: number, obj: Polygon): void {
+        // Make some checks but doesn't really care for the implementation
+		if (!this.objects) {
+			console.warn("objects map is undefined. Aborting routine.");
+			return;
+		}
+
+		if (!this.objects.get(index)) {
+			console.warn("index returned invalid object. Aborting routine.");
+			return;
+		}
+
+		this.objects.set(index, obj); // JS take care of these implementations for me
 	}
 
 	getIndexesSetAsArray(): Array<number> {
@@ -54,19 +77,7 @@ class PolygonObjectsBuffer implements IObjects2DBuffer {
 		return tmpObjectsArray;
 	}
 
-	updateObjectByIndex(index: number, obj: Polygon): void {
-		if (!this.objects) {
-			console.warn("objects map is undefined. Aborting routine.");
-			return;
-		}
 
-		if (!this.objects.get(index)) {
-			console.warn("index returned invalid object. Aborting routine.");
-			return;
-		}
-
-		this.objects.set(index, obj);
-	}
 }
 
 export default PolygonObjectsBuffer;
