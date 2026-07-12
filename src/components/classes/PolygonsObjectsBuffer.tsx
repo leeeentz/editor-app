@@ -4,19 +4,22 @@ import Polygon from "./Polygon";
 // A far more encapsulated class for querying and manipulating objects.
 // Using concrete implementation 'for now'
 class PolygonObjectsBuffer implements IObjects2DBuffer {
-	//private indexes: Array<number>;
-	private indexes: Set<number>
-	private objects?: Map<number, Polygon>;
+	private indexes: Set<number> // Using a set so it automatically handles duplicates for me
+	private objects: Map<number, Polygon>; 
 
-    // Please declare
 	constructor(){
 		this.indexes = new Set();
+        this.objects = new Map<number, Polygon>();
 	}
 
     // Must certainly ruturn a Polygon (seriously, make sure of that)
     getObjectByIndex(index: number): Polygon {
         if (!this.objects) {
             throw new Error("Objects map is undefined. Cannot retrieve polygon");
+        }
+
+        if (!this.indexes.has(index)) {
+            throw new Error("Input is out of indexes set.");
         }
 
         const tmpPolygon = this.objects.get(index);
@@ -37,7 +40,7 @@ class PolygonObjectsBuffer implements IObjects2DBuffer {
 		if (!this.objects.get(index)) {
 			throw new Error("index returned invalid object. Aborting routine.");
 		}
-
+        this.indexes.add(index);
 		this.objects.set(index, obj); // JS take care of the upsert for me
 	}
 
@@ -59,7 +62,7 @@ class PolygonObjectsBuffer implements IObjects2DBuffer {
 				break;
 			}
 
-			if (this.objects.get(n) !== undefined) { // Map.get(index) may return an object undefined. Like wtf?
+			if (this.objects.get(n) !== undefined) { // Map.get(index) may return an object or undefined. Like wtf?
 				const tmpObject:Polygon = this.objects.get(n) as Polygon; // Aliasing for tricking the linter
 				tmpObjectsArray.push(tmpObject); // Black magic
 			}			
@@ -67,25 +70,35 @@ class PolygonObjectsBuffer implements IObjects2DBuffer {
 		return tmpObjectsArray;
 	}
 
-    getIndexesArray(): Array<number> {
-        return new Array<number>(); // Temporary so the linter stop bitching
+    destroyObjectByIndex(index: number): number {
+        this.indexes.delete(index);
+        return -1;
     }
 
 	getIndexesSetAsArray(): Array<number> {
 		const tmpArray: Array<number> = [];
 		if (this.indexes.size === 0) {
-			console.log("Indexes set is empty. Returning empty array");
+			console.warn("Indexes set is empty. Returning empty array");
 			return new Array<number>();
 		}
 
-		const setIterator = this.indexes.values();
-		for (let i = 0; i < this.indexes.size; i ++) {
-			const currentIndex = setIterator.next().value;
-			tmpArray.push(currentIndex);
-		}
+        for (let n of this.indexes) {
+            tmpArray.push(n);
+        }
 		return tmpArray;
 	}
 
+    addObject(obj: Polygon): number {
+        let newIndex = -1;
+        for (let n of this.indexes) {
+            if (!this.indexes.has(n + 1)) {
+                this.indexes.add(n + 1);
+                this.objects.set(n + 1, obj);
+                newIndex = n + 1;
+            }
+        }
+        return newIndex;
+    }
 
 }
 
