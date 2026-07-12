@@ -12,8 +12,7 @@ class PolygonRenderer implements I2DRenderer {
 
     initialize(p: P5) {
         if (!p) {
-            console.log("Invalid or null P5 instance");
-            return;
+            throw new Error("Invalid or null P5 instance");
         }
         this.p = p;
         this.isInitialized = true;
@@ -22,18 +21,17 @@ class PolygonRenderer implements I2DRenderer {
 
     displayObjects(viewContext:string, renderingObjectsBuffer: Array<IPolygon>): void {
         if (!this.isInitialized || !this.p) {
-            console.warn("Renderer is not initialized");
-            return;
+            throw new Error("Renderer is not initialized");
         }
 
         if (renderingObjectsBuffer.length === 0) {
-            console.log("No active objects to display");
+            console.warn("No active objects to display");
             return;
         }
 
         for (let obj of renderingObjectsBuffer) {
             if (!obj.origin) {
-                console.log("Origin is undefined. Jumping to next object.");
+                console.warn("Origin is undefined. Jumping to next object.");
                 break;
             }
 
